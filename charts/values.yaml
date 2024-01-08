@@ -1,0 +1,12 @@
+components:
+  frontendProxy:
+    ingress:
+      enabled: true
+      annotations: {}
+      ingressClassName: nginx
+      hosts:
+        - host: frontend-proxy-oteldemo.example.com
+          paths:
+            - path: /
+              pathType: Prefix
+              port: 8080
