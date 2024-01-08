@@ -10,3 +10,30 @@ components:
             - path: /
               pathType: Prefix
               port: 8080
+  featureflagService:
+    ingress:
+      enabled: true
+      annotations: {}
+      ingressClassName: nginx
+      hosts:
+        - host: feature-flag-oteldemo.example.com
+          paths:
+            - path: /
+              pathType: Prefix
+              port: 8081
+  loadgenerator:
+    ingress:
+      enabled: true
+      annotations: {}
+      ingressClassName: nginx
+      hosts:
+        - host: load-generator-oteldemo.example.com
+          paths:
+            - path: /
+              pathType: Prefix
+              port: 8089
+grafana:
+  grafana.ini:
+    server:
+      root_url: "%(protocol)s://grafana-oteldemo.example.com/grafana"
+      serve_from_sub_path: true
