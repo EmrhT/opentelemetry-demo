@@ -13,16 +13,16 @@ exporters:
     tls:
       insecure: true
 extensions:
-  health_check: {}
+  health_check: {} # not active. more info --> https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/extension/healthcheckextension/README.md
 processors:
   batch: {}
-  filter/ottl:
-    error_mode: ignore
+  filter/ottl: # seems very useful. filters logs, metrics and traces with custom conditions. very flexible.
+    error_mode: ignore # more info --> https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/extension/healthcheckextension/README.md
     metrics:
       metric:
       - name == "rpc.server.duration"
-  k8sattributes:
-    extract:
+  k8sattributes: # allow automatic setting of spans, metrics and logs resource attributes with k8s metadata
+    extract: # more info --> https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/k8sattributesprocessor
       metadata:
       - k8s.namespace.name
       - k8s.deployment.name
@@ -44,24 +44,24 @@ processors:
         name: k8s.pod.uid
     - sources:
       - from: connection
-  memory_limiter:
-    check_interval: 5s
+  memory_limiter: # used to prevent out of memory situations on the collector
+    check_interval: 5s # more info --> https://github.com/open-telemetry/opentelemetry-collector/tree/main/processor/memorylimiterprocessor
     limit_percentage: 80
     spike_limit_percentage: 25
-  resource:
-    attributes:
+  resource: # used to apply changes on resource attributes
+    attributes: # more info --> https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/resourceprocessor
     - action: insert
       from_attribute: k8s.pod.uid
       key: service.instance.id
-  transform:
-    metric_statements:
+  transform: # modifies telemetry based on configuration using the OpenTelemetry Transformation Language
+    metric_statements: # more info --> https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/transformprocessor
     - context: metric
       statements:
       - set(description, "") where name == "queueSize"
       - set(description, "") where name == "rpc.server.duration"
       - set(description, "") where name == "http.client.duration"
 receivers:
-  jaeger:
+  jaeger: # more info --> https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/jaegerreceiver
     protocols:
       grpc:
         endpoint: ${env:MY_POD_IP}:14250
@@ -69,7 +69,7 @@ receivers:
         endpoint: ${env:MY_POD_IP}:6831
       thrift_http:
         endpoint: ${env:MY_POD_IP}:14268
-  otlp:
+  otlp: # more info --> https://github.com/open-telemetry/opentelemetry-collector/tree/main/receiver/otlpreceiver
     protocols:
       grpc:
         endpoint: ${env:MY_POD_IP}:4317
@@ -79,8 +79,8 @@ receivers:
           - http://*
           - https://*
         endpoint: ${env:MY_POD_IP}:4318
-  prometheus:
-    config:
+  prometheus: # is meant to minimally be a drop-in replacement for Prometheus. not all config works out-of-the-box
+    config: # more info --> https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/prometheusreceiver
       scrape_configs:
       - job_name: opentelemetry-collector
         scrape_interval: 10s
@@ -131,5 +131,5 @@ service:
       - jaeger
       - zipkin
   telemetry:
-    metrics:
+    metrics: # used to expose otelcol's own metrics
       address: ${env:MY_POD_IP}:8888
