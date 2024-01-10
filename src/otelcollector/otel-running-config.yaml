@@ -1,9 +1,9 @@
 connectors:
-  spanmetrics: null
+  spanmetrics: null # each connector has its own docs to be explored for the best usage. For this --> https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/connector/spanmetricsconnector/README.md
 exporters:
   debug:
     verbosity: detailed
-  logging: {}
+  logging: {} # depracated in favor of debug
   otlp:
     endpoint: 'my-otel-demo-jaeger-collector:4317'
     tls:
@@ -115,12 +115,12 @@ service:
       - batch
       receivers:
       - otlp
-      - spanmetrics
+      - spanmetrics # connectors connect different services' receivers and exporters. more info --> https://github.com/open-telemetry/opentelemetry-collector/tree/main/connector
     traces:
       exporters:
       - otlp
       - debug
-      - spanmetrics
+      - spanmetrics # connectors connect different services' receivers and exporters. more info --> https://github.com/open-telemetry/opentelemetry-collector/tree/main/connector
       processors:
       - k8sattributes
       - memory_limiter

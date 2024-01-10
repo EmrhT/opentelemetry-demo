@@ -39,3 +39,6 @@ opentelemetry-collector:
           - probabilistic_sampler
           - resource
           - batch
+    exporters:
+      debug:
+        verbosity: normal
